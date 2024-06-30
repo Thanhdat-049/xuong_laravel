@@ -103,8 +103,8 @@ class CatelogueController extends Controller
         $models = Catelogue::query()->findOrFail($id);
 
         $models->delete();
-        if ($models->cover && Storage::exists($$models->cover)) {
-            Storage::delete($$models->cover);
+        if ($models->cover && Storage::exists($models->cover)) {
+            Storage::delete($models->cover);
         }
         return back();
     }

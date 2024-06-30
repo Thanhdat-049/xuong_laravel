@@ -62,7 +62,7 @@
                                     </div>
                                     <div class="mt-3">
                                         <label for="basiInput" class="form-label">Catelogue</label>
-                                        <select type="text" class="form-control" id="catelogue" name="catelogue">
+                                        <select type="text" class="form-control" id="catelogue_id" name="catelogue_id">
                                             @foreach ($catelogue as $key => $item)
                                                 <option value="{{ $key }}">{{ $item }}</option>
                                             @endforeach
@@ -74,7 +74,7 @@
                                         <div class="col-md-2">
                                             <div class="form-check form-switch form-switch-primary mb-3">
                                                 <input class="form-check-input" type="checkbox" role="switch"
-                                                    id="is_active" checked name="is_active">
+                                                    id="is_active" checked name="is_active" value="1">
                                                 <label class="form-check-label" for="SwitchCheck2">Is Active</label>
                                             </div>
                                         </div>
@@ -82,7 +82,7 @@
                                         <div class="col-md-2">
                                             <div class="form-check form-switch form-switch-warning mb-3">
                                                 <input class="form-check-input" type="checkbox" role="switch"
-                                                    id="is_hot_deal" name="is_hot_deal">
+                                                    id="is_hot_deal" checked name="is_hot_deal" value="1">
                                                 <label class="form-check-label" for="SwitchCheck2">Is Hot Deal</label>
                                             </div>
                                         </div>
@@ -90,7 +90,7 @@
                                         <div class="col-md-3">
                                             <div class="form-check form-switch form-switch-success mb-3">
                                                 <input class="form-check-input" type="checkbox" role="switch"
-                                                    id="is_good_deal" name="is_good_deal">
+                                                    id="is_good_deal" checked name="is_good_deal" value="1">
                                                 <label class="form-check-label" for="SwitchCheck2">Is Good Deal</label>
                                             </div>
                                         </div>
@@ -98,7 +98,7 @@
                                         <div class="col-md-2">
                                             <div class="form-check form-switch form-switch-danger mb-3">
                                                 <input class="form-check-input" type="checkbox" role="switch"
-                                                    id="is_new" checked name="is_new">
+                                                    id="is_new" checked name="is_new" value="1">
                                                 <label class="form-check-label" for="SwitchCheck2">Is New</label>
                                             </div>
                                         </div>
@@ -106,7 +106,7 @@
                                         <div class="col-md-3">
                                             <div class="form-check form-switch form-switch-info mb-3">
                                                 <input class="form-check-input" type="checkbox" role="switch"
-                                                    id="is_show_home" checked name="is_show_home">
+                                                    id="is_show_home" checked name="is_show_home" value="1">
                                                 <label class="form-check-label" for="SwitchCheck2">Is Show Home</label>
                                             </div>
                                         </div>
@@ -181,7 +181,6 @@
                                                         name="product_variants[{{ $sizeid . '-' . $colorid }}][quantity]">
                                                 </td>
                                                 <td class="text-center">
-                                                    {{-- <input type="file" class="form-control" name="product_variants([{{ $sizeid . '-' . $colorid }}][image])"> --}}
                                                     <input type="file" class="form-control"
                                                         name="product_variants[{{ $sizeid . '-' . $colorid }}][image]">
 

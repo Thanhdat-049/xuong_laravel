@@ -77,8 +77,7 @@ class ProductSeeder extends Seeder
                         'product_id' => $i,
                         'image' => 'https://canifa.com/img/1000/1500/resize/8/b/8bj23a004-sj814-3.webp',
 
-                    ],
-                ]
+                    ],                ]
             );
 
             ProductGallery::query()->create(

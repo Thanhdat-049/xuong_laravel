@@ -18,7 +18,7 @@ class Catelogue extends Model
         'is_active' => 'boolean',
     ];
 
-    public function product(){
+    public function products(){
         return $this->hasMany(Product::class);
     }
 }

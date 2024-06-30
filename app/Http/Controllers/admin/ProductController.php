@@ -8,8 +8,13 @@ use App\Models\Product;
 use Illuminate\Support\Str;
 use App\Models\Catelogue;
 use App\Models\ProductColor;
+use App\Models\ProductGallery;
 use App\Models\ProductSize;
+use App\Models\ProductVariant;
+use Illuminate\Database\Eloquent\Exception;
 use App\Models\Tag;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -20,7 +25,6 @@ class ProductController extends Controller
     public function index()
     {
         $data = Product::query()->with(['catelogue', 'tags'])->latest('id')->get();
-        // dd($data->first()->tags->toArray());
         foreach ($data as $items) {
             $items->catelogue->name;
         }
@@ -44,10 +48,59 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $dataProduct = $request->except(['product_variants', 'tag']);
-        $dataProductTag = $request->tag;
-        $dataProductVariants = $request->product_variants;
-        dd($request->all());
+        $dataProduct = $request->except(['product_variants', 'tag', 'galleries']);
+        $dataProduct['is_hot_deal'] ??= 0;
+        $dataProduct['is_good_deal'] ??= 0;
+        $dataProduct['is_new'] ??=  0;
+        $dataProduct['is_show_home'] ??=  0;
+        $dataProduct['is_active'] ??= 0;
+        $dataProduct['slug'] = Str::slug($dataProduct['name']) . '-' . $dataProduct['sku'];
+        if ($dataProduct['img_thumbnail']) {
+            $dataProduct['img_thumbnail'] = Storage::put('products', $dataProduct['img_thumbnail']);
+        }
+        $dataProductTags = $request->tag;
+        $dataProductVariants = [];
+        $dataProductVariantsTmp = $request->product_variants;
+        $dataProductGalleries = $request->galleries;
+        foreach ($dataProductVariantsTmp as $key => $item) {
+            $tmp = explode('-', $key);
+            $dataProductVariants[] = [
+                'image' => $item['image'] ?? null,
+                'quantity' => $item['quantity'],
+                'product_size_id' => $tmp[0],
+                'product_color_id' => $tmp[1],
+            ];
+        };
+
+        try {
+            DB::beginTransaction();
+            $Product = Product::create($dataProduct);
+            foreach ($dataProductVariants as $item) {
+                $item['product_id'] = $Product->id;
+                if ($item['image']) {
+                    $item['image'] = Storage::put('products', $item['image']);
+                }
+                ProductVariant::query()->create($item);
+            }
+
+            $Product->tags()->sync($dataProductTags);
+
+            foreach ($dataProductGalleries as $key => $item) {
+
+                ProductGallery::query()->create([
+                    'product_id' => $Product->id,
+                    'image' => Storage::put('products', $item)
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('admin.products.index');
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            dd($exception->getMessage());
+            return back();
+        }
     }
 
     /**
@@ -79,6 +132,31 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        try {
+            DB::transaction(function () use ($product) {
+                $product->tags()->sync([]);
+                $product->variants()->delete();
+                $product->galleries()->delete();
+                $product->delete();
+
+                if ($product->img_thumbnail && Storage::exists($product->img_thumbnail)) {
+                    Storage::delete($product->img_thumbnail);
+                }
+
+                foreach ($product->galleries as $value) {
+                    if ($value->image && Storage::exists($value->image)) {
+                        Storage::delete($value->image);
+                    }
+                }
+                foreach ($product->variants as $value) {
+                    if ($value->image && Storage::exists($value->image)) {
+                        Storage::delete($value->image);
+                    }
+                }
+            }, 3);
+            return redirect()->route('admin.products.index');
+        } catch (\Exception $exception) {
+            return back();
+        }
     }
 }

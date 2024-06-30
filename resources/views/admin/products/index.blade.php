@@ -86,13 +86,19 @@
 
                                     <td>
                                         @foreach ($item->tags as $tag)
-                                        <span class="badge bg-info">{{$tag->name}}</span>
+                                            <span class="badge bg-info">{{ $tag->name }}</span>
                                         @endforeach
                                     </td>
 
                                     <td>{{ $item->created_at }}</td>
                                     <td>{{ $item->updated_at }}</td>
-                                    <td></td>
+                                    <td>
+                                        <form action="{{ route('admin.products.destroy', $item->id) }}" method="post">
+                                            @method('DELETE')
+                                            @csrf
+                                            <button onclick="return confirm('bạn có chắc chắn muốn xóa')" type="submit" class="btn btn-danger">Xóa</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
